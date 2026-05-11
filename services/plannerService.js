@@ -13,19 +13,7 @@ class PlannerService {
    * @returns {Object} The created revision plan
    */
   async generatePlan(userId, authHeader) {
-    let supabase = defaultSupabase;
-
-    if (authHeader) {
-      supabase = createClient(
-        process.env.SUPABASE_URL,
-        process.env.SUPABASE_ANON_KEY,
-        {
-          global: {
-            headers: { Authorization: authHeader }
-          }
-        }
-      );
-    }
+    const supabase = defaultSupabase;
 
     // 0. Ensure user exists in public.users (Workaround for missing trigger)
     await userService.ensureUserExists(userId, undefined, undefined, authHeader);
@@ -196,19 +184,7 @@ class PlannerService {
   }
 
   async getTodayPlan(userId, authHeader) {
-    let supabase = defaultSupabase;
-
-    if (authHeader) {
-      supabase = createClient(
-        process.env.SUPABASE_URL,
-        process.env.SUPABASE_ANON_KEY,
-        {
-          global: {
-            headers: { Authorization: authHeader }
-          }
-        }
-      );
-    }
+    const supabase = defaultSupabase;
 
     const today = new Date().toISOString().split('T')[0];
 
@@ -242,12 +218,7 @@ class PlannerService {
    * Generates real-time AI suggestions based on recent performance (mistakes, fluency).
    */
   async getAISuggestions(userId, authHeader) {
-    let supabase = defaultSupabase;
-    if (authHeader) {
-      supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
-        global: { headers: { Authorization: authHeader } }
-      });
-    }
+    const supabase = defaultSupabase;
 
     // Fetch last 10 sessions to analyze performance
     // Use select('*') to handle missing columns gracefully
@@ -335,19 +306,7 @@ class PlannerService {
   }
 
   async saveCustomPlan(userId, planPayload, authHeader) {
-    let supabase = defaultSupabase;
-
-    if (authHeader) {
-      supabase = createClient(
-        process.env.SUPABASE_URL,
-        process.env.SUPABASE_ANON_KEY,
-        {
-          global: {
-            headers: { Authorization: authHeader }
-          }
-        }
-      );
-    }
+    const supabase = defaultSupabase;
 
     await userService.ensureUserExists(userId, undefined, undefined, authHeader);
 

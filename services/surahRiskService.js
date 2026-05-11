@@ -5,14 +5,7 @@ const surahStabilityService = require('./surahStabilityService');
 
 class SurahRiskService {
   async getSurahRisks(userId, authHeader) {
-    let client = supabase;
-    if (authHeader) {
-      client = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
-        global: {
-          headers: { Authorization: authHeader }
-        }
-      });
-    }
+    const client = supabase;
 
     const [confidenceList, stabilityList, sessionsResult] = await Promise.all([
       strengthService.getConfidenceScores(userId, authHeader),

@@ -3,18 +3,7 @@ const supabase = require('../db/supabaseClient');
 
 class StrengthService {
   async getStrengthAnalysis(userId, authHeader) {
-    let client = supabase;
-    if (authHeader) {
-      client = createClient(
-        process.env.SUPABASE_URL,
-        process.env.SUPABASE_ANON_KEY,
-        {
-          global: {
-            headers: { Authorization: authHeader }
-          }
-        }
-      );
-    }
+    const client = supabase;
 
     let sessions;
     try {
@@ -82,18 +71,7 @@ class StrengthService {
   }
 
   async getConfidenceScores(userId, authHeader) {
-    let client = supabase;
-    if (authHeader) {
-      client = createClient(
-        process.env.SUPABASE_URL,
-        process.env.SUPABASE_ANON_KEY,
-        {
-          global: {
-            headers: { Authorization: authHeader }
-          }
-        }
-      );
-    }
+    const client = supabase;
 
     let sessions;
     try {
@@ -185,18 +163,7 @@ class StrengthService {
   }
 
   async getDeclineAlerts(userId, authHeader) {
-    let client = supabase;
-    if (authHeader) {
-      client = createClient(
-        process.env.SUPABASE_URL,
-        process.env.SUPABASE_ANON_KEY,
-        {
-          global: {
-            headers: { Authorization: authHeader }
-          }
-        }
-      );
-    }
+    const client = supabase;
 
     const { data: sessions, error } = await client
       .from('recitation_sessions')

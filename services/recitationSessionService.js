@@ -17,18 +17,7 @@ class RecitationSessionService {
       // Don't fail the session creation
     }
 
-    let client = supabase;
-    if (authHeader) {
-      client = createClient(
-        process.env.SUPABASE_URL,
-        process.env.SUPABASE_ANON_KEY,
-        {
-          global: {
-            headers: { Authorization: authHeader }
-          }
-        }
-      );
-    }
+    const client = supabase;
 
     const insertData = {
       user_id: sessionData.user_id,
@@ -84,18 +73,7 @@ class RecitationSessionService {
   }
 
   async getWeeklySummary(userId, authHeader) {
-    let client = supabase;
-    if (authHeader) {
-      client = createClient(
-        process.env.SUPABASE_URL,
-        process.env.SUPABASE_ANON_KEY,
-        {
-          global: {
-            headers: { Authorization: authHeader }
-          }
-        }
-      );
-    }
+    const client = supabase;
 
     // Use a more generous date range to avoid timezone issues
     const now = new Date();
@@ -157,18 +135,7 @@ class RecitationSessionService {
   }
 
   async getTodaySummary(userId, authHeader) {
-    let client = supabase;
-    if (authHeader) {
-      client = createClient(
-        process.env.SUPABASE_URL,
-        process.env.SUPABASE_ANON_KEY,
-        {
-          global: {
-            headers: { Authorization: authHeader }
-          }
-        }
-      );
-    }
+    const client = supabase;
 
     // Robust "Today" calculation: use 24 hours ago instead of start of day to be timezone-agnostic
     // Also, query WITHOUT the gte filter first to see if there are ANY sessions, for debugging

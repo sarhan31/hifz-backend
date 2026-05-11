@@ -3,14 +3,7 @@ const supabase = require('../db/supabaseClient');
 
 class SurahStabilityService {
   async getStability(userId, authHeader) {
-    let client = supabase;
-    if (authHeader) {
-      client = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
-        global: {
-          headers: { Authorization: authHeader }
-        }
-      });
-    }
+    const client = supabase;
 
     let data;
     try {

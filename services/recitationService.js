@@ -24,18 +24,7 @@ class RecitationService {
       console.error("Failed to record discipline activity in RecitationService:", err);
     }
 
-    let client = supabase;
-    if (authHeader) {
-      client = createClient(
-        process.env.SUPABASE_URL,
-        process.env.SUPABASE_ANON_KEY,
-        {
-          global: {
-            headers: { Authorization: authHeader }
-          }
-        }
-      );
-    }
+    const client = supabase;
 
     const { data, error } = await client
       .from('recitation_logs')
@@ -65,18 +54,7 @@ class RecitationService {
    * @returns {Array} List of logs
    */
   async getLogs(userId, authHeader) {
-    let client = supabase;
-    if (authHeader) {
-      client = createClient(
-        process.env.SUPABASE_URL,
-        process.env.SUPABASE_ANON_KEY,
-        {
-          global: {
-            headers: { Authorization: authHeader }
-          }
-        }
-      );
-    }
+    const client = supabase;
 
     const { data, error } = await client
       .from('recitation_logs')
@@ -99,18 +77,7 @@ class RecitationService {
    * @returns {Array} List of logs (surah_number, fluency_score)
    */
   async getAllLogsForStats(userId, authHeader) {
-    let client = supabase;
-    if (authHeader) {
-      client = createClient(
-        process.env.SUPABASE_URL,
-        process.env.SUPABASE_ANON_KEY,
-        {
-          global: {
-            headers: { Authorization: authHeader }
-          }
-        }
-      );
-    }
+    const client = supabase;
 
     const { data, error } = await client
       .from('recitation_logs')
