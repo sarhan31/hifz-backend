@@ -10,41 +10,40 @@ class RecitationService {
    * @param {string} [authHeader] - The Authorization header (Bearer token)
    * @returns {Object} The saved log entry
    */
-  async createLog(logData, authHeader) {
+  async createLog(logData, authHeader, email) {
     const { user_id, surah_number, ayah_start, ayah_end, fluency_score, audio_url } = logData;
 
-    // Ensure user exists in public.users before inserting log
-    // Pass authHeader to allow RLS bypass if service key is missing
-    await userService.ensureUserExists(user_id, undefined, undefined, authHeader);
-
-    // Record discipline activity
     try {
-      await disciplineService.recordActivity(user_id, authHeader);
+      console.log(`[RecitationService] Saving log for user: ${user_id}, surah: ${surah_number}`);
+      
+      // Ensure user exists
+      await userService.ensureUserExists(user_id, email, undefined, authHeader);
+
+      const { data, error } = await supabase
+        .from('recitation_logs')
+        .insert([{
+          user_id,
+          surah_number,
+          ayah_start,
+          ayah_end,
+          fluency_score,
+          audio_url,
+          created_at: new Date().toISOString()
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        console.error(`[RecitationService] Insert Error:`, error.message);
+        throw error;
+      }
+
+      console.log(`[RecitationService] Log saved successfully.`);
+      return data;
     } catch (err) {
-      console.error("Failed to record discipline activity in RecitationService:", err);
+      console.error(`[RecitationService] Critical Error:`, err.message);
+      throw err;
     }
-
-    const client = supabase;
-
-    const { data, error } = await client
-      .from('recitation_logs')
-      .insert([{
-        user_id,
-        surah_number,
-        ayah_start,
-        ayah_end,
-        fluency_score,
-        audio_url, // Add audio_url
-        created_at: new Date()
-      }])
-      .select()
-      .single();
-
-    if (error) {
-      throw new Error(`Error saving log: ${error.message}`);
-    }
-
-    return data;
   }
 
   /**

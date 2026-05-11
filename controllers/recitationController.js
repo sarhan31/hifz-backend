@@ -26,9 +26,10 @@ exports.createLog = async (req, res) => {
       audio_url 
     };
     
-    // Pass Authorization header to service
+    // Pass Authorization header and email to service
     const authHeader = req.headers.authorization;
-    const newLog = await recitationService.createLog(logData, authHeader);
+    const email = req.user?.email;
+    const newLog = await recitationService.createLog(logData, authHeader, email);
 
     res.status(201).json({ message: "Log saved successfully", data: newLog });
   } catch (error) {

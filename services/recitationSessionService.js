@@ -4,72 +4,47 @@ const userService = require('./userService');
 const disciplineService = require('./disciplineService');
 
 class RecitationSessionService {
-  async createSession(sessionData, authHeader) {
-    const { user_id } = sessionData;
+  async createSession(sessionData, authHeader, email) {
+    const { user_id, surah_id } = sessionData;
 
-    await userService.ensureUserExists(user_id, undefined, undefined, authHeader);
-
-    // Record discipline activity (Hifz Test)
     try {
-      await disciplineService.recordActivity(user_id, authHeader);
-    } catch (err) {
-      console.error("Failed to record discipline activity:", err);
-      // Don't fail the session creation
-    }
-
-    const client = supabase;
-
-    const insertData = {
-      user_id: sessionData.user_id,
-      surah_id: sessionData.surah_id,
-      accuracy: sessionData.accuracy,
-      mistake_count: sessionData.mistake_count,
-      duration_seconds: sessionData.duration_seconds,
-      words_per_minute: sessionData.words_per_minute
-      // Let the database handle created_at to avoid timezone issues
-    };
-
-    console.log(`Saving recitation session for user ${sessionData.user_id}, surah ${sessionData.surah_id}`);
-
-    // Add optional columns only if they are likely to exist
-    if (sessionData.fluency_score !== undefined) insertData.fluency_score = sessionData.fluency_score;
-    if (sessionData.pause_count !== undefined) insertData.pause_count = sessionData.pause_count;
-    if (sessionData.ayah_range !== undefined) insertData.ayah_range = sessionData.ayah_range;
-    if (sessionData.pronunciation_issues !== undefined) insertData.pronunciation_issues = sessionData.pronunciation_issues || [];
-
-    const { data, error } = await client
-      .from('recitation_sessions')
-      .insert([insertData])
-      .select(); // Remove .single() to be safer
-
-    if (error) {
-      console.error(`Primary insert failed for user ${sessionData.user_id}:`, error.message);
+      console.log(`[SessionService] Saving session for user: ${user_id}, surah: ${surah_id}`);
       
-      // Fallback: Try inserting only guaranteed columns
-      const fallbackData = {
-        user_id: sessionData.user_id,
-        surah_id: sessionData.surah_id,
-        accuracy: sessionData.accuracy,
-        mistake_count: sessionData.mistake_count,
-        duration_seconds: sessionData.duration_seconds,
-        words_per_minute: sessionData.words_per_minute
+      await userService.ensureUserExists(user_id, email, undefined, authHeader);
+
+      const insertData = {
+        user_id,
+        surah_id,
+        accuracy: sessionData.accuracy || 0,
+        mistake_count: sessionData.mistake_count || 0,
+        duration_seconds: sessionData.duration_seconds || 0,
+        words_per_minute: sessionData.words_per_minute || 0,
+        created_at: new Date().toISOString()
       };
 
-      const { data: fallbackRes, error: fallbackError } = await client
+      if (sessionData.fluency_score !== undefined) insertData.fluency_score = sessionData.fluency_score;
+
+      const { data, error } = await supabase
         .from('recitation_sessions')
-        .insert([fallbackData])
-        .select();
+        .insert([insertData])
+        .select()
+        .single();
 
-      if (fallbackError) {
-        console.error(`Fallback insert also failed for user ${sessionData.user_id}:`, fallbackError.message);
-        throw new Error(`Error saving recitation session (fallback also failed): ${fallbackError.message}`);
+      if (error) {
+        console.error(`[SessionService] Insert Error:`, error.message);
+        // Fallback attempt
+        const fallbackData = { user_id, surah_id, accuracy: sessionData.accuracy || 0 };
+        const { data: fbData, error: fbError } = await supabase.from('recitation_sessions').insert([fallbackData]).select().single();
+        if (fbError) throw fbError;
+        return fbData;
       }
-      console.log(`Recitation session saved via fallback for user ${sessionData.user_id}`);
-      return fallbackRes[0];
-    }
 
-    console.log(`Recitation session saved successfully for user ${sessionData.user_id}`);
-    return data[0];
+      console.log(`[SessionService] Session saved successfully.`);
+      return data;
+    } catch (err) {
+      console.error(`[SessionService] Critical Error:`, err.message);
+      throw err;
+    }
   }
 
   async getWeeklySummary(userId, authHeader) {

@@ -10,6 +10,7 @@ exports.createSession = async (req, res) => {
     }
 
     const authHeader = req.headers.authorization;
+    const email = req.user?.email;
     const sessionData = {
       user_id,
       surah_id,
@@ -23,7 +24,7 @@ exports.createSession = async (req, res) => {
       pronunciation_issues
     };
 
-    const savedSession = await recitationSessionService.createSession(sessionData, authHeader);
+    const savedSession = await recitationSessionService.createSession(sessionData, authHeader, email);
 
     res.status(201).json({ message: "Session saved successfully", data: savedSession });
   } catch (error) {
