@@ -2,7 +2,8 @@ const recitationService = require('../services/recitationService');
 
 exports.createLog = async (req, res) => {
   try {
-    const { user_id, surah_number, ayah_start, ayah_end, fluency_score } = req.body;
+    const user_id = req.user?.id || req.body.user_id;
+    const { surah_number, ayah_start, ayah_end, fluency_score } = req.body;
     
     // Get audio file path if uploaded
     let audio_url = null;
@@ -13,7 +14,7 @@ exports.createLog = async (req, res) => {
 
     // Basic validation
     if (!user_id || !surah_number || fluency_score === undefined) {
-      return res.status(400).json({ error: "Missing required fields" });
+      return res.status(400).json({ error: "Authenticated User ID or Surah data is missing" });
     }
 
     const logData = { 
@@ -38,10 +39,10 @@ exports.createLog = async (req, res) => {
 
 exports.getLogs = async (req, res) => {
   try {
-    const { user_id } = req.params;
+    const user_id = req.user?.id || req.params.user_id;
 
     if (!user_id) {
-      return res.status(400).json({ error: "User ID is required" });
+      return res.status(400).json({ error: "Authenticated User ID is required" });
     }
 
     // Pass Authorization header to service
@@ -57,10 +58,10 @@ exports.getLogs = async (req, res) => {
 
 exports.getStrengthStats = async (req, res) => {
   try {
-    const { user_id } = req.params;
+    const user_id = req.user?.id || req.params.user_id;
 
     if (!user_id) {
-      return res.status(400).json({ error: "User ID is required" });
+      return res.status(400).json({ error: "Authenticated User ID is required" });
     }
 
     // Pass Authorization header to service

@@ -2,10 +2,10 @@ const strengthService = require('../services/strengthService');
 
 exports.getDeclineAlerts = async (req, res) => {
   try {
-    const { user_id } = req.params;
+    const user_id = req.user?.id || req.params.user_id;
 
     if (!user_id) {
-      return res.status(400).json({ error: "User ID is required" });
+      return res.status(400).json({ error: "Authenticated User ID is required" });
     }
 
     const authHeader = req.headers.authorization;

@@ -3,7 +3,7 @@ const bookmarkService = require('../services/bookmarkService');
 exports.getBookmarks = async (req, res) => {
   try {
     const userId = req.user?.id || req.query.userId || req.body.user_id;
-    if (!userId) return res.status(400).json({ error: "User ID is required" });
+    if (!userId) return res.status(400).json({ error: "Authenticated User ID is required" });
     const bookmarks = await bookmarkService.getBookmarks(userId);
     res.status(200).json(bookmarks);
   } catch (error) {
@@ -17,7 +17,7 @@ exports.addBookmark = async (req, res) => {
     const userId = req.user?.id || req.body.user_id;
     if (!userId) {
       console.error("Add Bookmark Failed: No User ID");
-      return res.status(400).json({ error: "User ID is required" });
+      return res.status(400).json({ error: "Authenticated User ID is required" });
     }
     const bookmark = await bookmarkService.addBookmark(userId, req.body);
     res.status(201).json(bookmark);
@@ -41,8 +41,8 @@ exports.deleteBookmark = async (req, res) => {
 
 exports.getLastSession = async (req, res) => {
   try {
-    const { userId } = req.params;
-    if (!userId) return res.status(400).json({ error: "User ID is required" });
+    const userId = req.user?.id || req.params.userId;
+    if (!userId) return res.status(400).json({ error: "Authenticated User ID is required" });
     const session = await bookmarkService.getLastSession(userId);
     res.status(200).json(session);
   } catch (error) {

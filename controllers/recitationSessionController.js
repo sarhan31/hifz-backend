@@ -2,10 +2,11 @@ const recitationSessionService = require('../services/recitationSessionService')
 
 exports.createSession = async (req, res) => {
   try {
-    const { user_id, surah_id, accuracy, fluency_score, mistake_count, pause_count, duration_seconds, words_per_minute, ayah_range, pronunciation_issues } = req.body;
+    const user_id = req.user?.id || req.body.user_id;
+    const { surah_id, accuracy, fluency_score, mistake_count, pause_count, duration_seconds, words_per_minute, ayah_range, pronunciation_issues } = req.body;
 
     if (!user_id || !surah_id) {
-      return res.status(400).json({ error: "Missing required fields" });
+      return res.status(400).json({ error: "Authenticated User ID or Surah ID is missing" });
     }
 
     const authHeader = req.headers.authorization;
@@ -33,10 +34,10 @@ exports.createSession = async (req, res) => {
 
 exports.getWeeklySummary = async (req, res) => {
   try {
-    const { user_id } = req.params;
+    const user_id = req.user?.id || req.params.user_id;
 
     if (!user_id) {
-      return res.status(400).json({ error: "User ID is required" });
+      return res.status(400).json({ error: "Authenticated User ID is required" });
     }
 
     const authHeader = req.headers.authorization;
@@ -51,10 +52,10 @@ exports.getWeeklySummary = async (req, res) => {
 
 exports.getTodaySummary = async (req, res) => {
   try {
-    const { user_id } = req.params;
+    const user_id = req.user?.id || req.params.user_id;
 
     if (!user_id) {
-      return res.status(400).json({ error: "User ID is required" });
+      return res.status(400).json({ error: "Authenticated User ID is required" });
     }
 
     const authHeader = req.headers.authorization;

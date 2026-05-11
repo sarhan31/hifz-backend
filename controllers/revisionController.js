@@ -2,11 +2,10 @@ const plannerService = require('../services/plannerService');
 
 exports.generatePlan = async (req, res) => {
   try {
-    const { user_id } = req.body;
+    const user_id = req.user?.id || req.body.user_id;
 
-    // 1. Validate user_id
     if (!user_id) {
-      return res.status(400).json({ error: "User ID is required" });
+      return res.status(400).json({ error: "Authenticated User ID is required" });
     }
 
     const authHeader = req.headers.authorization;
@@ -21,10 +20,10 @@ exports.generatePlan = async (req, res) => {
 
 exports.getTodayPlan = async (req, res) => {
   try {
-    const { user_id } = req.params;
+    const user_id = req.user?.id || req.params.user_id;
 
     if (!user_id) {
-      return res.status(400).json({ error: "User ID is required" });
+      return res.status(400).json({ error: "Authenticated User ID is required" });
     }
 
     const authHeader = req.headers.authorization;
@@ -40,10 +39,10 @@ exports.getTodayPlan = async (req, res) => {
 
 exports.getAISuggestions = async (req, res) => {
   try {
-    const { user_id } = req.params;
+    const user_id = req.user?.id || req.params.user_id;
 
     if (!user_id) {
-      return res.status(400).json({ error: "User ID is required" });
+      return res.status(400).json({ error: "Authenticated User ID is required" });
     }
 
     const authHeader = req.headers.authorization;
@@ -59,10 +58,11 @@ exports.getAISuggestions = async (req, res) => {
 
 exports.saveCustomPlan = async (req, res) => {
   try {
-    const { user_id, sabaq, sabaqi, manzil } = req.body;
+    const user_id = req.user?.id || req.body.user_id;
+    const { sabaq, sabaqi, manzil } = req.body;
 
     if (!user_id) {
-      return res.status(400).json({ error: "User ID is required" });
+      return res.status(400).json({ error: "Authenticated User ID is required" });
     }
 
     const authHeader = req.headers.authorization;
