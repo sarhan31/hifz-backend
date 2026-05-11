@@ -1,0 +1,1 @@
+ALTER TABLE recitation_sessions ADD COLUMN fluency_score INTEGER;
