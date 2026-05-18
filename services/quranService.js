@@ -203,13 +203,20 @@ class QuranService {
       const possibleSurahs = competing.map(c => {
         const [sid] = c[0].split(':').map(Number);
         const surah = quranData.find(s => s.id === sid);
-        return surah ? surah.transliteration : "Unknown";
+        return surah ? { id: surah.id, name: surah.transliteration } : null;
+      }).filter(Boolean);
+
+      // Filter unique surahs by id
+      const uniqueSurahs = [];
+      const seenIds = new Set();
+      possibleSurahs.forEach(s => {
+        if (!seenIds.has(s.id)) {
+          seenIds.add(s.id);
+          uniqueSurahs.push(s);
+        }
       });
 
-      // Filter unique surah names
-      const uniqueSurahs = [...new Set(possibleSurahs)];
-
-      console.log(`Ambiguity detected between: ${uniqueSurahs.join(", ")}`);
+      console.log(`Ambiguity detected between: ${uniqueSurahs.map(s => s.name).join(", ")}`);
       
       return {
         detected: true,
